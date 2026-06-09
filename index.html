@@ -1762,12 +1762,8 @@ if (typeof kakao !== 'undefined' && kakao.maps) {
 } else {
   document.getElementById('map-loading').innerHTML = `
     <div class="setup-guide">
-      <h3>카카오 지도 API 키 필요</h3>
-      <p>
-        <a href="https://developers.kakao.com" target="_blank">developers.kakao.com</a>에서<br>
-        JavaScript 키를 발급받아<br>
-        <code>b56c68e6ce45a41a278ae2abfc055a2d</code> 를 교체해 주세요.
-      </p>
+      <h3>지도를 불러올 수 없습니다</h3>
+      <p>잠시 후 다시 시도해 주세요.<br>문제가 지속되면 페이지를 새로고침해 주세요.</p>
     </div>`;
   updateStats(SAMPLE_DATA);
 }
