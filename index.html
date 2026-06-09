@@ -859,20 +859,22 @@
       align-items: center;
       justify-content: space-between;
       padding: 0 40px;
-      height: 48px;
+      height: 44px;
       border-bottom: 1px solid var(--border);
       background: var(--white);
       flex-shrink: 0;
+      gap: 8px;
     }
 
     .menu-bar-left {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 2px;
+      flex-shrink: 0;
     }
 
     .menu-btn {
-      padding: 6px 14px;
+      padding: 6px 12px;
       background: none;
       border: none;
       font-family: var(--sans);
@@ -881,23 +883,26 @@
       cursor: pointer;
       border-radius: 3px;
       transition: all 0.15s;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
     }
 
     .menu-btn:hover { background: var(--bg); color: var(--text-dark); }
 
     .menu-report-btn {
-      padding: 6px 16px;
+      padding: 7px 14px;
       background: var(--text-dark);
       color: var(--white);
       border: none;
-      font-family: var(--serif);
+      font-family: var(--sans);
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
       border-radius: 3px;
       transition: background 0.15s;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .menu-report-btn:hover { background: #3a3a3a; }
@@ -991,7 +996,7 @@
         flex: 1;
       }
 
-      .menu-bar { padding: 0 20px; }
+      .menu-bar { padding: 0 16px; height: 44px; }
       .sb-header { padding: 16px 20px 14px; }
       .sb-title  { font-size: 32px; }
       .sb-body   { padding: 14px 20px; gap: 12px; }
