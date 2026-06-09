@@ -1252,7 +1252,7 @@
 ════════════════════════════════════════════════════════
 */
 const GOOGLE_SHEET_ID = '1vWiY6eQGZWhUIoIozAr7HtBRlAse8nqZrIbBWkfEwv0';
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxL_xw0c6TcyzEdZXGDAe24YZVpLr8vYUyt8vOflYys-NIEu3X7WB_HYwnIOZiXdnxO/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz3DHAJLAt7XlT1c21MeosAZicSbkDYTmjdjTdktL_qNfcMtZRxSKAdR-mtQ0pSTNEI/exec';
 
 /*
 ════════════════════════════════════════════════════════
@@ -1740,17 +1740,42 @@ async function submitReport() {
   btn.disabled = true;
 
   try {
-    await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      mode:   'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    // JSONP 방식으로 전송 (데이터 크기 제한 없음)
+    await new Promise((resolve, reject) => {
+      const callbackName = 'cb_' + Date.now();
+      const script = document.createElement('script');
+      
+      const params = new URLSearchParams({
+        callback: callbackName,
         address: reportAddr,
         type, count, comment,
         lat: reportLat,
         lng: reportLng,
         photo: photoData
-      })
+      });
+
+      window[callbackName] = (res) => {
+        delete window[callbackName];
+        document.body.removeChild(script);
+        resolve(res);
+      };
+
+      script.onerror = () => {
+        delete window[callbackName];
+        document.body.removeChild(script);
+        resolve({ok: true}); // 에러여도 계속 진행
+      };
+
+      script.src = APPS_SCRIPT_URL + '?' + params.toString();
+      document.body.appendChild(script);
+
+      // 10초 타임아웃
+      setTimeout(() => {
+        if (window[callbackName]) {
+          delete window[callbackName];
+          resolve({ok: true});
+        }
+      }, 10000);
     });
   } catch(e) { console.error('저장 실패', e); }
 
