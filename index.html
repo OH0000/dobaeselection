@@ -1099,6 +1099,7 @@
       현수막 제보하기
     </button>
     <p class="notice">개인정보 미수집 · 공익 데이터로만 활용</p>
+    <p class="notice" id="last-update" style="margin-top:4px;"></p>
   </div>
 
 </aside>
@@ -1357,7 +1358,18 @@ async function loadReports() {
 
     data = rows.map((row, i) => ({
       id:       i + 1,
-      date:     row.c[1]?.v || '',
+      date:     (function(v) {
+        if (!v) return '';
+        if (typeof v === 'string') return v.slice(0, 10);
+        // Date(yyyy,m,d) 형태 처리 — 구글 시트는 월을 0부터 시작
+        if (typeof v === 'object' && v) {
+          var d = new Date(v);
+          return d.getFullYear() + '-' +
+            String(d.getMonth()+1).padStart(2,'0') + '-' +
+            String(d.getDate()).padStart(2,'0');
+        }
+        return String(v).slice(0,10);
+      })(row.c[1]?.v),
       address:  row.c[2]?.v || '',
       type:     row.c[3]?.v || '',
       count:    row.c[4]?.v || 1,
@@ -1474,15 +1486,13 @@ function renderMarkers() {
 /* ── 통계 카운터 ───────────────────────────────── */
 function updateStats(data) {
   // 한국 시간 기준 오늘 날짜
-  const today = new Date().toLocaleDateString('ko-KR', {
-    timeZone: 'Asia/Seoul',
-    year: 'numeric', month: '2-digit', day: '2-digit'
-  }).replace(/\. /g, '-').replace('.', '').trim();
+  const now = new Date();
+  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  const today = kst.toISOString().slice(0, 10);
 
-  // 구글 시트 날짜 형식(yyyy-MM-dd)과 비교
   const todayCt = data.filter(r => {
     const d = r.date ? r.date.toString().slice(0, 10) : '';
-    return d === today || d === new Date().toISOString().slice(0, 10);
+    return d === today;
   }).length;
 
   const regions = new Set(data.map(r => (r.address || '').split(' ')[0]).filter(Boolean)).size;
@@ -1490,6 +1500,11 @@ function updateStats(data) {
   countUp('cnt-total', data.length);
   countUp('cnt-today', todayCt);
   countUp('cnt-rgn',   regions);
+
+  // 마지막 업데이트 시각 표시
+  const timeStr = kst.toISOString().slice(11, 16).replace('T', ' ');
+  const updateEl = document.getElementById('last-update');
+  if (updateEl) updateEl.textContent = '마지막 업데이트 ' + timeStr;
 }
 
 function countUp(id, target) {
